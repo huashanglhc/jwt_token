@@ -51,3 +51,14 @@ class Login(APIView):
             "token": user.token
         }
         return Response(resp)
+
+
+class Order(APIView):
+
+    def get(self, request):
+        return Response({"code": 200, "msg": "订单模块"})
+
+
+class Goods(APIView):
+    def get(self, request):
+        return Response({"code": 200, "msg": "商品模块"})
