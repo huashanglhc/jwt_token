@@ -8,8 +8,9 @@
 @Describe: 
 """
 import uuid
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.views import APIView, Response
+from rest_framework.exceptions import APIException
 from jwt.models import User
 
 
@@ -36,7 +37,17 @@ class Register(APIView):
 class Login(APIView):
 
     def post(self, request):
-        name = self.request.DATA.get("name")
-        pwd = self.request.DATA.get("pwd")
-
-        return Response({"code": 200, "msg": "hello jwt token"})
+        name = self.request.POST.get("name")
+        pwd = self.request.POST.get("pwd")
+        user = User.objects.get(username=name)
+        if user is None:
+            raise APIException("用户名不存在")
+        is_correct = check_password(pwd, user.pwd)
+        if not is_correct:
+            raise APIException("密码错误...")
+        resp = {
+            "id": user.id,
+            "user_name": user.username,
+            "token": user.token
+        }
+        return Response(resp)
